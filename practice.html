@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ali Ahmad - Interactive Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chosen Palette: Warm Neutrals (Stone, Amber accents) -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard rather than a static document. It uses a grid-based layout to present information functionally. The 'Executive Summary' provides immediate context. The 'Skills Analytics' section uses a visual chart to break down technical competencies by category, allowing for rapid assessment. The 'Professional Journey' employs an interactive tabbed interface to keep the view clean while offering deep dives into specific roles. The 'Project Portfolio' uses a filterable grid to let viewers explore work based on technology tags. This structure was chosen to maximize engagement, allowing recruiters or hiring managers to navigate directly to their areas of interest (e.g., skills vs. actual project implementations) without linear scrolling. -->
+    <!-- Visualization & Content Choices: 
+         1. Skills Breakdown -> Goal: Inform/Organize -> Viz: Doughnut Chart -> Interaction: Hover tooltips -> Justification: Quickly shows the breadth and focus areas of the candidate's tech stack. -> Library: Chart.js (NO SVG/Mermaid).
+         2. Experience -> Goal: Inform/Change -> Viz: Interactive Tabbed Panel -> Interaction: Click to reveal role details -> Justification: Prevents text overload, encourages active reading of responsibilities. -> Library: Vanilla JS + Tailwind.
+         3. Projects -> Goal: Organize/Filter -> Viz: Card Grid -> Interaction: Category filtering buttons -> Justification: Allows users to easily find projects relevant to specific tech stacks (e.g., Frontend vs Fullstack). -> Library: Vanilla JS + Tailwind. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 500px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px; 
+            max-height: 350px; 
+        }
+        @media (min-width: 768px) { 
+            .chart-container { height: 350px; } 
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        amber: {
+                            700: '#b45309',
+                            800: '#92400e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased">
+
+    <nav class="sticky top-0 z-50 bg-stone-100/90 backdrop-blur border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-stone-900 tracking-tight">Ali Ahmad.</span>
+                </div>
+                <div class="flex items-center space-x-4 sm:space-x-8 text-sm font-medium">
+                    <a href="#summary" class="hover:text-amber-700 transition-colors hidden sm:block">Summary</a>
+                    <a href="#skills" class="hover:text-amber-700 transition-colors">Skills</a>
+                    <a href="#experience" class="hover:text-amber-700 transition-colors">Experience</a>
+                    <a href="#projects" class="hover:text-amber-700 transition-colors">Projects</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <header id="summary" class="bg-white rounded-2xl p-8 shadow-sm border border-stone-100">
+            <p class="text-sm font-semibold text-amber-700 uppercase tracking-wider mb-2">Frontend Developer</p>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-stone-900 mb-4">Ali Ahmad</h1>
+            <div class="flex flex-wrap gap-4 text-sm text-stone-600 mb-6">
+                <span class="flex items-center gap-1">&#128205; Lahore, Pakistan</span>
+                <span class="flex items-center gap-1">&#128222; 03004051925</span>
+                <span class="flex items-center gap-1">&#9993; theweborbit.dev@gmail.com</span>
+                <a href="https://aliahmadabbas.netlify.app/" target="_blank" class="flex items-center gap-1 hover:text-amber-700 transition-colors">&#127760; Portfolio</a>
+                <a href="https://github.com/theweborbitdev" target="_blank" class="flex items-center gap-1 hover:text-amber-700 transition-colors">&#128187; GitHub</a>
+            </div>
+            <p class="text-lg leading-relaxed text-stone-700 max-w-4xl">
+                Enthusiastic and detail-oriented Frontend Developer specializing in the MERN stack. Experienced in building responsive, scalable web applications with React.js, Next.js, and Tailwind CSS, along with secure and efficient backend solutions using Node.js, Express, and MongoDB. Adept at implementing authentication, payment gateways (e.g., Stripe), and RESTful APIs. Passionate about delivering impactful digital solutions and collaborating on full-stack projects.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <section id="skills" class="lg:col-span-5 bg-white rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col">
+                <h2 class="text-2xl font-bold text-stone-900 mb-2">Skills Analytics</h2>
+                <p class="text-sm text-stone-500 mb-6">
+                    This section visualizes the distribution of my technical toolset. The chart categorizes my core competencies, demonstrating a strong emphasis on modern frontend and backend technologies. Hover over the segments to see the specific counts for each domain.
+                </p>
+                
+                <div class="flex-grow flex items-center justify-center mb-6">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Frontend</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">React.js</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">Next.js</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">Redux Toolkit</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">Tailwind CSS</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">React Hook Form</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Backend & Database</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">Node.js</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">Express.js</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">MongoDB</span>
+                            <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded">RESTful APIs</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="experience" class="lg:col-span-7 bg-white rounded-2xl p-8 shadow-sm border border-stone-100">
+                <h2 class="text-2xl font-bold text-stone-900 mb-2">Professional Journey</h2>
+                <p class="text-sm text-stone-500 mb-6">
+                    Explore my professional experience interactively. Click on the roles below to reveal specific responsibilities, achievements, and the technologies utilized in each position. This provides a clear view of my practical application of the MERN stack.
+                </p>
+
+                <div class="flex space-x-2 border-b border-stone-200 mb-6">
+                    <button class="exp-tab active px-4 py-2 font-medium text-amber-700 border-b-2 border-amber-700 focus:outline-none transition-colors" data-target="exp-1">
+                        Dev Weekends
+                    </button>
+                    <button class="exp-tab px-4 py-2 font-medium text-stone-500 border-b-2 border-transparent hover:text-stone-700 focus:outline-none transition-colors" data-target="exp-2">
+                        Developers Cornor
+                    </button>
+                </div>
+
+                <div id="exp-1" class="exp-content block animate-fade-in">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-900">Dev Weekends Fellowship</h3>
+                            <p class="text-md text-amber-700 font-medium">Dev Weekends</p>
+                        </div>
+                        <span class="text-sm text-stone-500 bg-stone-100 px-3 py-1 rounded-full">May 2025 - Present</span>
+                    </div>
+                    <ul class="space-y-3 text-stone-700 mb-4">
+                        <li class="flex items-start">
+                            <span class="text-amber-700 mr-2 mt-1">&#8227;</span>
+                            Participating in a 3-month hands-on fellowship focused on MERN stack development and Data Structures & Algorithms (DSA) using JavaScript and C++.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-700 mr-2 mt-1">&#8227;</span>
+                            Building full-stack projects with authentication, RESTful APIs, state management, and performance optimization using industry-standard practices.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-700 mr-2 mt-1">&#8227;</span>
+                            Engaging in team collaboration, regular code reviews, and solving DSA problems daily on Leetcode to strengthen interview readiness.
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="exp-2" class="exp-content hidden animate-fade-in">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-900">Frontend Development - Internee</h3>
+                            <p class="text-md text-amber-700 font-medium">Developers Cornor | Lahore, Pakistan</p>
+                        </div>
+                        <span class="text-sm text-stone-500 bg-stone-100 px-3 py-1 rounded-full">Feb 2025 - May 2025</span>
+                    </div>
+                    <ul class="space-y-3 text-stone-700 mb-4">
+                        <li class="flex items-start">
+                            <span class="text-amber-700 mr-2 mt-1">&#8227;</span>
+                            Completed Frontend Development Internship, gaining hands-on experience in building responsive web interfaces using React.js and core web technologies.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-700 mr-2 mt-1">&#8227;</span>
+                            Learned and applied essential frontend libraries including Redux Toolkit, React Query, Axios, and React Hook Form in real-world projects.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-700 mr-2 mt-1">&#8227;</span>
+                            Applied best practices in performance optimization and component reusability.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mt-8 pt-8 border-t border-stone-100">
+                    <h3 class="text-lg font-bold text-stone-900 mb-4">Education</h3>
+                    <div class="bg-stone-50 rounded-xl p-4 border border-stone-200">
+                        <h4 class="font-bold text-stone-800">Bachelor of Business Information Technology</h4>
+                        <p class="text-sm text-amber-700 mb-2">Virtual University of Pakistan - Lahore (2023 - 2027)</p>
+                        <p class="text-sm text-stone-600"><strong>Relevant Coursework:</strong> Web Development, OOP, DSA, Operating Systems, DBMS, AI, Software Engineering, UX/UI, Computer Networks.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section id="projects" class="bg-white rounded-2xl p-8 shadow-sm border border-stone-100">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-stone-900 mb-2">Project Portfolio</h2>
+                    <p class="text-sm text-stone-500 max-w-2xl">
+                        A curated selection of my recent full-stack and frontend development projects. Use the filters to sort projects based on their primary technology focus. This section highlights my ability to build end-to-end solutions.
+                    </p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex space-x-2 bg-stone-100 p-1 rounded-lg">
+                    <button class="filter-btn active px-3 py-1 text-sm font-medium rounded-md bg-white shadow-sm text-stone-800" data-filter="all">All</button>
+                    <button class="filter-btn px-3 py-1 text-sm font-medium rounded-md text-stone-500 hover:text-stone-800" data-filter="fullstack">Fullstack</button>
+                    <button class="filter-btn px-3 py-1 text-sm font-medium rounded-md text-stone-500 hover:text-stone-800" data-filter="frontend">Frontend</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="projects-grid">
+                
+                <div class="project-card border border-stone-200 rounded-xl p-6 hover:shadow-md transition-shadow bg-stone-50" data-category="frontend">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Personal Developer Portfolio</h3>
+                        <div class="flex gap-2">
+                            <a href="https://aliahmadabbas.netlify.app/" target="_blank" class="text-stone-400 hover:text-amber-700" title="Live Site">&#127760;</a>
+                            <a href="https://github.com/theweborbitdev/personal-portfolio" target="_blank" class="text-stone-400 hover:text-amber-700" title="GitHub Repo">&#128187;</a>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded font-medium">React.js</span>
+                        <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded font-medium">Next.js</span>
+                        <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded font-medium">Tailwind CSS</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li>&#8227; Designed and developed a fully responsive personal portfolio website to showcase projects and technical skills.</li>
+                        <li>&#8227; Implemented modern UI/UX with optimized component structure for scalability.</li>
+                        <li>&#8227; Deployed the application on Netlify with continuous updates through version control.</li>
+                    </ul>
+                </div>
+
+                <div class="project-card border border-stone-200 rounded-xl p-6 hover:shadow-md transition-shadow bg-stone-50" data-category="fullstack">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Burger Buddy</h3>
+                        <div class="flex gap-2">
+                            <a href="https://github.com/theweborbitdev/Burger-buddy" target="_blank" class="text-stone-400 hover:text-amber-700" title="GitHub Repo">&#128187;</a>
+                        </div>
+                    </div>
+                    <p class="text-xs font-semibold text-stone-500 mb-3">Food Ordering Web Application</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-stone-200 text-stone-800 text-xs rounded font-medium">React.js</span>
+                        <span class="px-2 py-1 bg-stone-200 text-stone-800 text-xs rounded font-medium">Node.js</span>
+                        <span class="px-2 py-1 bg-stone-200 text-stone-800 text-xs rounded font-medium">Express.js</span>
+                        <span class="px-2 py-1 bg-stone-200 text-stone-800 text-xs rounded font-medium">MongoDB</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li>&#8227; Developed a responsive food ordering web application with an interactive interface.</li>
+                        <li>&#8227; Implemented backend APIs using Node.js and Express.js to manage products and order processing.</li>
+                        <li>&#8227; Integrated MongoDB for efficient CRUD operations and scalable data management.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="text-center py-8 text-stone-500 text-sm">
+            <p>Interactive Resume Dashboard &copy; 2026 Ali Ahmad</p>
+            <p class="mt-2 text-xs">Certifications: Full-Stack Web Dev Bootcamp (Udemy) | Ultimate React Course (Udemy)</p>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Initialize Skills Chart (Chart.js)
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            
+            // Data extracted and categorized from resume
+            const skillsData = {
+                labels: ['Frontend', 'Backend & APIs', 'Databases & ORMs', 'Languages', 'Tools & Deploy'],
+                datasets: [{
+                    label: 'Number of Technologies',
+                    data: [7, 4, 5, 3, 6], 
+                    backgroundColor: [
+                        '#b45309', // amber-700
+                        '#d97706', // amber-600
+                        '#f59e0b', // amber-500
+                        '#44403c', // stone-700
+                        '#78716c'  // stone-500
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 4
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: skillsData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 11
+                                },
+                                color: '#44403c',
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' Technologies mapped';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // 2. Experience Tabs Interaction Logic
+            const tabs = document.querySelectorAll('.exp-tab');
+            const contents = document.querySelectorAll('.exp-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active states
+                    tabs.forEach(t => {
+                        t.classList.remove('text-amber-700', 'border-amber-700');
+                        t.classList.add('text-stone-500', 'border-transparent');
+                    });
+                    contents.forEach(c => {
+                        c.classList.remove('block');
+                        c.classList.add('hidden');
+                    });
+
+                    // Add active state to clicked
+                    tab.classList.add('text-amber-700', 'border-amber-700');
+                    tab.classList.remove('text-stone-500', 'border-transparent');
+                    
+                    const targetId = tab.getAttribute('data-target');
+                    document.getElementById(targetId).classList.remove('hidden');
+                    document.getElementById(targetId).classList.add('block');
+                });
+            });
+
+            // 3. Project Filtering Logic
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const projectCards = document.querySelectorAll('.project-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active button styling
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-white', 'shadow-sm', 'text-stone-800');
+                        b.classList.add('text-stone-500');
+                    });
+                    btn.classList.add('bg-white', 'shadow-sm', 'text-stone-800');
+                    btn.classList.remove('text-stone-500');
+
+                    const filterValue = btn.getAttribute('data-filter');
+
+                    // Filter cards
+                    projectCards.forEach(card => {
+                        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
